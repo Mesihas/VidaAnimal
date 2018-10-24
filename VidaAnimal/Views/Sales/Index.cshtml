@@ -1,0 +1,90 @@
+﻿
+@{
+  ViewData["Title"] = "Ventas";
+}
+@*<h2>@ViewData["Title"]</h2>
+  <h3>@ViewData["Message"]</h3>*@
+
+<style>
+  .date-picker-bar {
+    font-weight: bold;
+    background: rgba(192,192,192,0.2);
+    border: 1px solid gray;
+    border-radius: 5px 5px 0 0;
+    height: 40px;
+    padding: 3px 0 0 0;
+  }
+
+  /*#busqueda {
+
+  }
+  .glyphicon.glyphicon-search {
+    font-size: 20px;
+  }*/
+
+  .glyphicon-large {
+    font-size: 15px;
+    position: relative;
+    top: 5px;
+    border: 1px solid rgb(211,211,211);
+    padding: 4px 4px 4px 4px;
+    border-radius: 3px 3px 3px 3px;
+    /*margin: -0.5em auto 0px;*/
+  }
+</style>
+<br />
+@*<div class="row pl-3">
+  <div class="col">*@
+<div id="total"></div>
+<a href="@Url.Action("Create", "Sales")" class="btn btn-primary">
+  Agregan nueva Venta
+  <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+</a>
+@*</div>
+  </div>*@
+<br /><br />
+@*<div class="row">*@
+<div class="date-picker-bar">
+  <label>&nbsp;&nbsp;&nbsp;Desde:&nbsp;</label>
+  <input id="start" style="width: 20%;" />
+  <label>&nbsp;&nbsp;&nbsp;&nbsp;Hasta:&nbsp;</label>
+  <input id="end" style="width: 20%;" />
+  &nbsp;&nbsp;&nbsp;<i id="get" class="glyphicon glyphicon-search glyphicon-large"></i>
+</div>
+
+<div id="salesGrid"></div>
+@*</div>*@
+<br />
+########## Detalle de Venta ########
+<hr />
+<div id="products">
+  <table class="table table-striped" id="testAJAX">
+    <thead>
+      <tr>
+        <th> Prod-id </th>
+        <th> Prod Name </th>
+        <th> Quantity </th>
+        <th> Price </th>
+        <th> Total Item</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script src="~/js/VidaAnimalScripts/sales.js"></script>
+<br /><br />
+
+<style>
+  .k-grid .k-state-selected {
+    background-color: #DEA1A1 !important;
+    color: #000000;
+    font-weight: bold;
+  }
+
+  .k-grid .k-alt.k-state-selected {
+    background-color: #DEA1A1 !important;
+    color: #000000;
+    font-weight: bold;
+  }
+</style>

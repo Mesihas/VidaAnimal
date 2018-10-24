@@ -1,0 +1,40 @@
+﻿@model SupplierIndexViewModel
+<h2>Proveedores</h2>
+<p> Total: @Model.Total</p>
+
+<div class="row">
+    <div class="col-6">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th> #Id </th>
+                    <th> Nombre Proveedor </th>
+                    <th> Telefono</th>
+                    <th> Direccion </th>
+                    <th> Accion </th>
+                </tr>
+            </thead>
+            @foreach (var item in Model.Suppliers)
+            {
+                <tbody>
+                    <tr>
+                        <td>@item.SupplierId</td>
+                        <td>@item.SupplierName</td>
+                        <td>@item.Telephone</td>
+                        <td>@item.Address</td>
+                        <td>@Html.ActionLink("Edit..", "Update", "Supplier", new { id = item.SupplierId })</td>
+                    </tr>
+                </tbody>
+            }
+        </table>
+    </div>
+    <div class="col-1">
+
+    </div>
+</div>
+
+<a href="@Url.Action("Create", "Supplier")" class="btn btn-primary">
+   Agregar Proveedor
+    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+</a>
+<br /><br /><br />

@@ -1,0 +1,88 @@
+﻿<br />
+<p>new sa</p>
+  @*<div class="container">*@
+  <div class="row">
+    <div class="col-sm-2">
+      <div class="form-group">
+        <label for="exampleInputEmail1">Date</label>
+        <input type="text" class="form-control" id="datepicker" placeholder="Seleccione fecha">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2">
+      <div class="form-group">
+        <label for="exampleInputEmail1">CLi</label>
+        <input type="text" class="form-control" id="client" placeholder="xxxxxx">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2">
+      <div class="form-group">
+        <label for="exampleInputEmail1">info</label>
+        <input type="text" class="form-control" id="info" placeholder="xxxxxx">
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-2">
+      <div class="form-group">
+        <label for="exampleInputEmail1">payWay</label>
+        <input type="text" class="form-control" id="payWay" placeholder="xxxxxx">
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row">
+    @*<div class="col-10">*@
+    <div class="form-row">
+      <div class="form-group col-md-2">
+        <label for="example">Category</label>
+        <select class="form-control" id="CategoriesDropdown"></select>
+      </div>
+      <div class="form-group col-md-3">
+        <label for="example1">Product</label>
+        <select class="form-control" id="productsDropdown"></select>
+      </div>
+      <div class="form-group col-md-1">
+        <label for="inputZip">Cant</label>
+        <input type="text" class="form-control" id="Quantity">
+      </div>
+      <div class="form-group col-md-1">
+        <label for="inputZip">Price</label>
+        <input type="text" class="form-control" id="Price">
+      </div>
+      <div class="form-group col-md-1">
+        <label for="inputZip">Total Item</label>
+        <input type="text" class="form-control" id="TotalItem">
+      </div>
+      <div class="form-group col-md-1">
+        <div class="align-items-baseline">
+          <label>&nbsp;</label>
+          <button type="submit" class="btn btn-primary btn-as-block" id="addItem">Agregar</button>
+        </div>
+      </div>
+    </div>
+    @*</div>*@
+  </div>
+  @*</div>*@
+
+  <br />
+  <div id="GridSaleItems"></div>
+  <br />
+  <div class="align-items-baseline">
+    <label>&nbsp;</label>
+    <button type="submit" class="btn btn-primary btn-as-block" id="saveSale">Save</button>
+  </div>
+  <style>
+    .btn.btn-as-block {
+      display: block;
+    }
+  </style>
+
+  <script src="~/js/VidaAnimalScripts/newSale.js"></script>
+
+

@@ -1,0 +1,26 @@
+﻿@model SupplierUpdateViewModel
+
+<h2>Modificar Proveedor</h2>
+<form asp-controller="Supplier" asp-action="Update" method="post">
+    <div class="col-3">
+        <label for="validationDefault02">Nombre</label>
+        <input asp-for="SupplierName" type="text" class="form-control" id="validationDefault02" placeholder="">
+    </div>
+
+    <div class="col-3">
+        <label for="validationDefault02">Direccion</label>
+        <input asp-for="Address" type="text" class="form-control" id="validationDefault02" placeholder="">
+    </div>
+    <div class="col-3">
+        <label for="validationDefault02">Telefono</label>
+        <input asp-for="Telephone" type="text" class="form-control" id="validationDefault02" placeholder="">
+    </div>
+    <div>
+        <input type="hidden" asp-for="SupplierId" />
+    </div>
+    <hr />
+    <br />
+    <div>
+        <input type="Submit" class="btn btn-primary" value="Guardar" />
+    </div>
+</form>

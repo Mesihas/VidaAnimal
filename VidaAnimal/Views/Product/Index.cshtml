@@ -1,0 +1,76 @@
+﻿@model ProductIndexViewModel
+@{
+    ViewData["Title"] = "Productos";
+}
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["Message"]</h3>
+
+
+@*<h1>Bienvenido a Vida Animal</h1>*@
+
+<p> Total de Productos: @Model.Total</p>
+
+
+
+<div class="row">
+    <div class="col-12">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th> #Id </th>
+                    <th> Categoria </th>
+                    <th> Nombre Producto</th>
+                    <th> Proveedor</th>
+                    <th> Costo</th>
+                    <th> Iva</th>
+                    <th> Descuento</th>
+                    <th> Remarcacion</th>
+                    <th> PRECIO</th>
+                    <th> Actual. Precio</th>
+                    <th> Accion </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Products)
+                {
+                    <tr>
+                        <td>@item.ProductId</td>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            if (@item.CategoryId == cat.CategoryId)
+                            {
+                                <td>@cat.Name</td>
+                            }
+                        }
+                        <td>@item.ProductName</td>
+                        @foreach (var sup in Model.Suppliers)
+                        {
+                            if (@item.SupplierId == sup.SupplierId)
+                            {
+                                <td>@sup.SupplierName</td>
+                            }
+                        }
+                        <td>$@item.Cost</td>      
+                        <td>%@item.IVA</td>                           
+                        <td>%@item.Discount</td> 
+                        <td>%@item.Marked</td> 
+                        <td>$@item.Precio</td> 
+                        <td>@item.PriceLastUdate.ToShortDateString()</td> 
+                        <td> @Html.ActionLink("...Edit", "Edit", "Product", new { Id = item.ProductId })</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+   <a href="@Url.Action("Create", "Product")" class="btn btn-primary">
+        Agregan nuevo Producto
+        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+    </a>
+        @*
+    <a href="@Url.Action("Index", "SubCategory", new { Id= @Model.CategoryId })" class="btn btn-primary">
+        Back to SubCategory
+        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+    </a>
+    *@
+<br /><br /><br /><br /><br /><br />

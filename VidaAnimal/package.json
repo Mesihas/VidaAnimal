@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "name": "asp.net-core-npm-client",
+  "private": true,
+  "devDependencies": {
+    //"font-awesome": "4.7.0"
+  }
+}

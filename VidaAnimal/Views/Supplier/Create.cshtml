@@ -1,0 +1,23 @@
+﻿@model SupplierCreateViewModel
+
+<h2>Crear nuevo Proveedor</h2>
+<form asp-controller="Supplier" asp-action="Create" method="post">
+    <div class="col-3">
+        <label for="validationDefault02">Nombre</label>
+        <input asp-for="SupplierName" type="text" class="form-control" id="validationDefault02" placeholder="">
+    </div>
+
+    <div class="col-3">
+        <label for="validationDefault02">Direccion</label>
+        <input asp-for="Address" type="text" class="form-control" id="validationDefault02" placeholder="">
+    </div>
+    <div class="col-3">
+        <label for="validationDefault02">Telefono</label>
+        <input asp-for="Telephone" type="text" class="form-control" id="validationDefault02" placeholder="">
+    </div>
+    <hr />
+    <br />
+    <div>
+        <input type="Submit" class="btn btn-primary" value="Guardar" />
+    </div>
+</form>

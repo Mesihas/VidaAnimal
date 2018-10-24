@@ -1,0 +1,24 @@
+﻿@model AccountLoginViewModel
+<h3>Login</h3>
+<form asp-controller="Account" asp-action="Login" method="post">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div class="form-group">
+        <label asp-for="Name"  ></label>
+        <input asp-for="Name" class="form-control" placeholder="Enter User Name" />
+        <span asp-validation-for="Name"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password"  class="form-control" placeholder="Enter Password"/>
+        <span asp-validation-for="Password"></span>
+    </div>
+    <div>
+        <label asp-for="RememberMe"></label>
+        <input asp-for="RememberMe" />
+        <span asp-validation-for="RememberMe"></span>
+    </div>
+    <div>
+        <input type="submit" value="Login" class="btn btn-primary"/>
+    </div>
+</form>
+
