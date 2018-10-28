@@ -11,6 +11,8 @@ const DEFAULT_OPTIONS = {
     '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
   trigger: 'hover focus',
   offset: 0,
+  arrowSelector: '.tooltip-arrow, .tooltip__arrow',
+  innerSelector: '.tooltip-inner, .tooltip__inner',
 };
 
 export default class Tooltip {
@@ -19,16 +21,17 @@ export default class Tooltip {
    * @class Tooltip
    * @param {HTMLElement} reference - The DOM node used as reference of the tooltip (it can be a jQuery element).
    * @param {Object} options
-   * @param {String} options.placement=bottom
+   * @param {String} options.placement='top'
    *      Placement of the popper accepted values: `top(-start, -end), right(-start, -end), bottom(-start, -end),
    *      left(-start, -end)`
+   * @param {String} options.arrowSelector='.tooltip-arrow, .tooltip__arrow' - className used to locate the DOM arrow element in the tooltip.
+   * @param {String} options.innerSelector='.tooltip-inner, .tooltip__inner' - className used to locate the DOM inner element in the tooltip.
    * @param {HTMLElement|String|false} options.container=false - Append the tooltip to a specific element.
    * @param {Number|Object} options.delay=0
    *      Delay showing and hiding the tooltip (ms) - does not apply to manual trigger type.
    *      If a number is supplied, delay is applied to both hide/show.
    *      Object structure is: `{ show: 500, hide: 100 }`
-   * @param {Boolean} options.html=false - Insert HTML into the tooltip. If false, the content will inserted with `innerText`.
-   * @param {String|PlacementFunction} options.placement='top' - One of the allowed placements, or a function returning one of them.
+   * @param {Boolean} options.html=false - Insert HTML into the tooltip. If false, the content will inserted with `textContent`.
    * @param {String} [options.template='<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>']
    *      Base HTML to used when creating the tooltip.
    *      The tooltip's `title` will be injected into the `.tooltip-inner` or `.tooltip__inner`.
@@ -38,7 +41,7 @@ export default class Tooltip {
    * @param {String} [options.trigger='hover focus']
    *      How tooltip is triggered - click, hover, focus, manual.
    *      You may pass multiple triggers; separate them with a space. `manual` cannot be combined with any other trigger.
-   * @param {HTMLElement} options.boundariesElement
+   * @param {String|HTMLElement} options.boundariesElement
    *      The element used as boundaries for the tooltip. For more information refer to Popper.js'
    *      [boundariesElement docs](https://popper.js.org/popper-documentation.html)
    * @param {Number|String} options.offset=0 - Offset of the tooltip relative to its reference. For more information refer to Popper.js'
@@ -114,11 +117,13 @@ export default class Tooltip {
     }
   };
 
-  //
-  // Defaults
-  //
-  arrowSelector = '.tooltip-arrow, .tooltip__arrow';
-  innerSelector = '.tooltip-inner, .tooltip__inner';
+  /**
+   * Updates the tooltip's title content
+   * @method Tooltip#updateTitleContent
+   * @memberof Tooltip
+   * @param {String|HTMLElement} title - The new content to use for the title
+   */
+  updateTitleContent = (title) => this._updateTitleContent(title);
 
   //
   // Private methods
@@ -134,7 +139,7 @@ export default class Tooltip {
    * @param {String} template
    * @param {String|HTMLElement|TitleFunction} title
    * @param {Boolean} allowHtml
-   * @return {HTMLelement} tooltipNode
+   * @return {HTMLElement} tooltipNode
    */
   _create(reference, template, title, allowHtml) {
     // create tooltip element
@@ -151,23 +156,27 @@ export default class Tooltip {
     tooltipNode.setAttribute('aria-hidden', 'false');
 
     // add title to tooltip
-    const titleNode = tooltipGenerator.querySelector(this.innerSelector);
+    const titleNode = tooltipGenerator.querySelector(this.options.innerSelector);
+    this._addTitleContent(reference, title, allowHtml, titleNode);
+
+    // return the generated tooltip node
+    return tooltipNode;
+  }
+
+  _addTitleContent(reference, title, allowHtml, titleNode) {
     if (title.nodeType === 1 || title.nodeType === 11) {
       // if title is a element node or document fragment, append it only if allowHtml is true
       allowHtml && titleNode.appendChild(title);
     } else if (isFunction(title)) {
-      // if title is a function, call it and set innerText or innerHtml depending by `allowHtml` value
+      // if title is a function, call it and set textContent or innerHtml depending by `allowHtml` value
       const titleText = title.call(reference);
       allowHtml
         ? (titleNode.innerHTML = titleText)
-        : (titleNode.innerText = titleText);
+        : (titleNode.textContent = titleText);
     } else {
-      // if it's just a simple text, set innerText or innerHtml depending by `allowHtml` value
-      allowHtml ? (titleNode.innerHTML = title) : (titleNode.innerText = title);
+      // if it's just a simple text, set textContent or innerHtml depending by `allowHtml` value
+      allowHtml ? (titleNode.innerHTML = title) : (titleNode.textContent = title);
     }
-
-    // return the generated tooltip node
-    return tooltipNode;
   }
 
   _show(reference, options) {
@@ -180,7 +189,7 @@ export default class Tooltip {
 
     // if the tooltipNode already exists, just show it
     if (this._tooltipNode) {
-      this._tooltipNode.style.display = '';
+      this._tooltipNode.style.visibility = 'visible';
       this._tooltipNode.setAttribute('aria-hidden', 'false');
       this.popperInstance.update();
       return this;
@@ -218,7 +227,7 @@ export default class Tooltip {
     this._popperOptions.modifiers = {
       ...this._popperOptions.modifiers,
       arrow: {
-        element: this.arrowSelector,
+        element: this.options.arrowSelector,
       },
       offset: {
         offset: options.offset,
@@ -251,7 +260,7 @@ export default class Tooltip {
     this._isOpen = false;
 
     // hide tooltipNode
-    this._tooltipNode.style.display = 'none';
+    this._tooltipNode.style.visibility = 'hidden';
     this._tooltipNode.setAttribute('aria-hidden', 'true');
 
     return this;
@@ -294,7 +303,7 @@ export default class Tooltip {
    * Append tooltip to container
    * @memberof Tooltip
    * @private
-   * @param {HTMLElement} tooltip
+   * @param {HTMLElement} tooltipNode
    * @param {HTMLElement|String|false} container
    */
   _append(tooltipNode, container) {
@@ -413,16 +422,30 @@ export default class Tooltip {
 
     return false;
   };
-}
 
-/**
- * Placement function, its context is the Tooltip instance.
- * @memberof Tooltip
- * @callback PlacementFunction
- * @param {HTMLElement} tooltip - tooltip DOM node.
- * @param {HTMLElement} reference - reference DOM node.
- * @return {String} placement - One of the allowed placement options.
- */
+  _updateTitleContent(title) {
+    if(typeof this._tooltipNode === 'undefined') {
+      if(typeof this.options.title !== 'undefined') {
+        this.options.title = title;
+      }
+      return;
+    }
+    const titleNode = this._tooltipNode.parentNode.querySelector(this.options.innerSelector);
+    this._clearTitleContent(titleNode, this.options.html, this.reference.getAttribute('title') || this.options.title)
+    this._addTitleContent(this.reference, title, this.options.html, titleNode);
+    this.options.title = title;
+    this.popperInstance.update();
+  }
+
+  _clearTitleContent(titleNode, allowHtml, lastTitle) {
+    if(lastTitle.nodeType === 1 || lastTitle.nodeType === 11) {
+      allowHtml && titleNode.removeChild(lastTitle);
+    } else {
+      allowHtml ? titleNode.innerHTML = '' : titleNode.textContent = '';
+    }
+  }
+
+}
 
 /**
  * Title function, its context is the Tooltip instance.

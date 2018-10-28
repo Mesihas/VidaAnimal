@@ -5,6 +5,7 @@ import getOffsetRectRelativeToArbitraryNode from './getOffsetRectRelativeToArbit
 import getViewportOffsetRectRelativeToArtbitraryNode from './getViewportOffsetRectRelativeToArtbitraryNode';
 import getWindowSizes from './getWindowSizes';
 import isFixed from './isFixed';
+import getFixedPositionOffsetParent from './getFixedPositionOffsetParent';
 
 /**
  * Computed the boundaries limits and return them
@@ -14,7 +15,7 @@ import isFixed from './isFixed';
  * @param {HTMLElement} reference
  * @param {number} padding
  * @param {HTMLElement} boundariesElement - Element used to define the boundaries
- * @param {HTMLElement} fixedParent - Force this element as the parent
+ * @param {Boolean} fixedPosition - Is in fixed position mode
  * @returns {Object} Coordinates of the boundaries
  */
 export default function getBoundaries(
@@ -22,16 +23,19 @@ export default function getBoundaries(
   reference,
   padding,
   boundariesElement,
-  fixedParent = null
+  fixedPosition = false
 ) {
   // NOTE: 1 DOM access here
+
   let boundaries = { top: 0, left: 0 };
-  const offsetParent = fixedParent || findCommonOffsetParent(popper, reference);
+  const offsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, reference);
 
   // Handle viewport case
-  if (boundariesElement === 'viewport') {
-    boundaries = getViewportOffsetRectRelativeToArtbitraryNode(offsetParent);
-  } else {
+  if (boundariesElement === 'viewport' ) {
+    boundaries = getViewportOffsetRectRelativeToArtbitraryNode(offsetParent, fixedPosition);
+  }
+
+  else {
     // Handle other cases based on DOM element used as boundaries
     let boundariesNode;
     if (boundariesElement === 'scrollParent') {
@@ -47,12 +51,13 @@ export default function getBoundaries(
 
     const offsets = getOffsetRectRelativeToArbitraryNode(
       boundariesNode,
-      offsetParent
+      offsetParent,
+      fixedPosition
     );
 
     // In case of HTML, we need a different computation
     if (boundariesNode.nodeName === 'HTML' && !isFixed(offsetParent)) {
-      const { height, width } = getWindowSizes();
+      const { height, width } = getWindowSizes(popper.ownerDocument);
       boundaries.top += offsets.top - offsets.marginTop;
       boundaries.bottom = height + offsets.top;
       boundaries.left += offsets.left - offsets.marginLeft;
@@ -64,10 +69,12 @@ export default function getBoundaries(
   }
 
   // Add paddings
-  boundaries.left += padding;
-  boundaries.top += padding;
-  boundaries.right -= padding;
-  boundaries.bottom -= padding;
+  padding = padding || 0;
+  const isPaddingNumber = typeof padding === 'number';
+  boundaries.left += isPaddingNumber ? padding : padding.left || 0; 
+  boundaries.top += isPaddingNumber ? padding : padding.top || 0; 
+  boundaries.right -= isPaddingNumber ? padding : padding.right || 0; 
+  boundaries.bottom -= isPaddingNumber ? padding : padding.bottom || 0; 
 
   return boundaries;
 }

@@ -1,5 +1,6 @@
 import getOffsetParent from '../utils/getOffsetParent';
 import getBoundaries from '../utils/getBoundaries';
+import getSupportedPropertyName from '../utils/getSupportedPropertyName';
 
 /**
  * @function
@@ -9,9 +10,8 @@ import getBoundaries from '../utils/getBoundaries';
  * @returns {Object} The data object, properly modified
  */
 export default function preventOverflow(data, options) {
-  const fixedParent = data.positionFixed ? window.document.documentElement : undefined;
   let boundariesElement =
-    options.boundariesElement || fixedParent || getOffsetParent(data.instance.popper);
+    options.boundariesElement || getOffsetParent(data.instance.popper);
 
   // If offsetParent is the reference element, we really want to
   // go one step up and use the next offsetParent as reference to
@@ -20,13 +20,30 @@ export default function preventOverflow(data, options) {
     boundariesElement = getOffsetParent(boundariesElement);
   }
 
+  // NOTE: DOM access here
+  // resets the popper's position so that the document size can be calculated excluding
+  // the size of the popper element itself
+  const transformProp = getSupportedPropertyName('transform');
+  const popperStyles = data.instance.popper.style; // assignment to help minification
+  const { top, left, [transformProp]: transform } = popperStyles;
+  popperStyles.top = '';
+  popperStyles.left = '';
+  popperStyles[transformProp] = '';
+
   const boundaries = getBoundaries(
     data.instance.popper,
     data.instance.reference,
     options.padding,
     boundariesElement,
-    fixedParent
+    data.positionFixed
   );
+
+  // NOTE: DOM access here
+  // restores the original style properties after the offsets have been computed
+  popperStyles.top = top;
+  popperStyles.left = left;
+  popperStyles[transformProp] = transform;
+
   options.boundaries = boundaries;
 
   const order = options.priority;
@@ -61,9 +78,8 @@ export default function preventOverflow(data, options) {
   };
 
   order.forEach(placement => {
-    const side = ['left', 'top'].indexOf(placement) !== -1
-      ? 'primary'
-      : 'secondary';
+    const side =
+      ['left', 'top'].indexOf(placement) !== -1 ? 'primary' : 'secondary';
     popper = { ...popper, ...check[side](placement) };
   });
 
