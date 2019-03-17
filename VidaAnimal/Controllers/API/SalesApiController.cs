@@ -35,11 +35,16 @@ namespace VidaAnimal.Controllers
 
     [HttpGet("api/GetSales")]
   //  [Authorize]
-  //  public JsonResult GetSales(int skip, int take, int page, int pageSize, [FromQuery] List<GridSort> sort, [FromQuery] GridFilters filter)
-    public JsonResult GetSales(int skip, int take, int page, int pageSize, DateTime startDate, DateTime endDate)
+  //  public JsonResult GetSales(int skip, int take, int page, int pageSize, [FromQuery] List<GridSort> sort, )
+  // public JsonResult GetSales(int skip, int take, int page, int pageSize, DateTime startDate, DateTime endDate)
+
+    public IActionResult GetSales(int skip, int take, int page, int pageSize, GridFilters filter)         
     {
+      string dat = HttpContext.Request.Query["filter"].ToString();
       try
       {
+        DateTime startDate = DateTime.Now;
+        DateTime endDate = DateTime.Now;
         Vamo result =  _salesrProvider.GetSales(skip, take, page, pageSize, startDate, endDate);
 
         return Json(new
@@ -162,6 +167,24 @@ namespace VidaAnimal.Controllers
       }
     }
   }
+  //public class GridFilter
+  //{
+  //  public string Operator { get; set; }
+  //  public string Field { get; set; }
+  //  public string Value { get; set; }
+  //}
+
+  //public class GridFilters
+  //{
+  //  public List<GridFilter> Filters { get; set; }
+  //  public string Logic { get; set; }
+  //}
+
+  //public class GridSort
+  //{
+  //  public string Field { get; set; }
+  //  public string Dir { get; set; }
+  //}
 }
 
 

@@ -43,8 +43,8 @@ namespace VidaAnimal
             }).AddEntityFrameworkStores<MyDbContext>();
 
             services.AddDbContext<MyDbContext>();
-            services.AddTransient<ISupplierProvider>(f => new SupplierProvider(@"Data Source = ALEJANDRO-PC; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"));
-            services.AddTransient<ISalesDataService>(f => new SalesDataService(@"Data Source = ALEJANDRO-PC; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"));
+            services.AddTransient<ISupplierProvider>(f => new SupplierProvider(@"Data Source = DESKTOP-ALE; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"));
+            services.AddTransient<ISalesDataService>(f => new SalesDataService(@"Data Source = DESKTOP-ALE; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"));
 
       
       // add My services      
@@ -101,8 +101,8 @@ namespace VidaAnimal
             {
                 routes.MapRoute(
                     name: "default",
-                    //       template: "{controller=Home}/{action=Index}/{id?}");
-                    template: "{controller=Sales}/{action=Index}/{id?}");
+                           template: "{controller=Home}/{action=Index}/{id?}");
+                   // template: "{controller=Sales}/{action=Index}/{id?}");
             });
         }
     }

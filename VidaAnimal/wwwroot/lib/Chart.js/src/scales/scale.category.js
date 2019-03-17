@@ -1,135 +1,71 @@
-'use strict';
+"use strict";
 
-var Scale = require('../core/core.scale');
-var scaleService = require('../core/core.scaleService');
+module.exports = function(Chart) {
 
-module.exports = function() {
-
+	var helpers = Chart.helpers;
 	// Default config for a category scale
 	var defaultConfig = {
-		position: 'bottom'
+		position: "bottom"
 	};
 
-	var DatasetScale = Scale.extend({
-		/**
-		* Internal function to get the correct labels. If data.xLabels or data.yLabels are defined, use those
-		* else fall back to data.labels
-		* @private
-		*/
-		getLabels: function() {
-			var data = this.chart.data;
-			return this.options.labels || (this.isHorizontal() ? data.xLabels : data.yLabels) || data.labels;
-		},
-
-		determineDataLimits: function() {
-			var me = this;
-			var labels = me.getLabels();
-			me.minIndex = 0;
-			me.maxIndex = labels.length - 1;
+	var DatasetScale = Chart.Scale.extend({
+		buildTicks: function(index) {
+			this.startIndex = 0;
+			this.endIndex = this.chart.data.labels.length;
 			var findIndex;
 
-			if (me.options.ticks.min !== undefined) {
+			if (this.options.ticks.min !== undefined) {
 				// user specified min value
-				findIndex = labels.indexOf(me.options.ticks.min);
-				me.minIndex = findIndex !== -1 ? findIndex : me.minIndex;
+				findIndex = helpers.indexOf(this.chart.data.labels, this.options.ticks.min);
+				this.startIndex = findIndex !== -1 ? findIndex : this.startIndex;
 			}
 
-			if (me.options.ticks.max !== undefined) {
+			if (this.options.ticks.max !== undefined) {
 				// user specified max value
-				findIndex = labels.indexOf(me.options.ticks.max);
-				me.maxIndex = findIndex !== -1 ? findIndex : me.maxIndex;
+				findIndex = helpers.indexOf(this.chart.data.labels, this.options.ticks.max);
+				this.endIndex = findIndex !== -1 ? findIndex : this.endIndex;
 			}
 
-			me.min = labels[me.minIndex];
-			me.max = labels[me.maxIndex];
-		},
-
-		buildTicks: function() {
-			var me = this;
-			var labels = me.getLabels();
 			// If we are viewing some subset of labels, slice the original array
-			me.ticks = (me.minIndex === 0 && me.maxIndex === labels.length - 1) ? labels : labels.slice(me.minIndex, me.maxIndex + 1);
+			this.ticks = (this.startIndex === 0 && this.endIndex === this.chart.data.labels.length) ? this.chart.data.labels : this.chart.data.labels.slice(this.startIndex, this.endIndex + 1);
 		},
 
 		getLabelForIndex: function(index, datasetIndex) {
-			var me = this;
-			var data = me.chart.data;
-			var isHorizontal = me.isHorizontal();
-
-			if (data.yLabels && !isHorizontal) {
-				return me.getRightValue(data.datasets[datasetIndex].data[index]);
-			}
-			return me.ticks[index - me.minIndex];
+			return this.ticks[index];
 		},
 
 		// Used to get data value locations.  Value can either be an index or a numerical value
-		getPixelForValue: function(value, index) {
-			var me = this;
-			var offset = me.options.offset;
+		getPixelForValue: function(value, index, datasetIndex, includeOffset) {
 			// 1 is added because we need the length but we have the indexes
-			var offsetAmt = Math.max((me.maxIndex + 1 - me.minIndex - (offset ? 0 : 1)), 1);
+			var offsetAmt = Math.max((this.ticks.length - ((this.options.gridLines.offsetGridLines) ? 0 : 1)), 1);
 
-			// If value is a data object, then index is the index in the data array,
-			// not the index of the scale. We need to change that.
-			var valueCategory;
-			if (value !== undefined && value !== null) {
-				valueCategory = me.isHorizontal() ? value.x : value.y;
-			}
-			if (valueCategory !== undefined || (value !== undefined && isNaN(index))) {
-				var labels = me.getLabels();
-				value = valueCategory || value;
-				var idx = labels.indexOf(value);
-				index = idx !== -1 ? idx : index;
-			}
+			if (this.isHorizontal()) {
+				var innerWidth = this.width - (this.paddingLeft + this.paddingRight);
+				var valueWidth = innerWidth / offsetAmt;
+				var widthOffset = (valueWidth * (index - this.startIndex)) + this.paddingLeft;
 
-			if (me.isHorizontal()) {
-				var valueWidth = me.width / offsetAmt;
-				var widthOffset = (valueWidth * (index - me.minIndex));
-
-				if (offset) {
+				if (this.options.gridLines.offsetGridLines && includeOffset) {
 					widthOffset += (valueWidth / 2);
 				}
 
-				return me.left + Math.round(widthOffset);
-			}
-			var valueHeight = me.height / offsetAmt;
-			var heightOffset = (valueHeight * (index - me.minIndex));
-
-			if (offset) {
-				heightOffset += (valueHeight / 2);
-			}
-
-			return me.top + Math.round(heightOffset);
-		},
-		getPixelForTick: function(index) {
-			return this.getPixelForValue(this.ticks[index], index + this.minIndex, null);
-		},
-		getValueForPixel: function(pixel) {
-			var me = this;
-			var offset = me.options.offset;
-			var value;
-			var offsetAmt = Math.max((me._ticks.length - (offset ? 0 : 1)), 1);
-			var horz = me.isHorizontal();
-			var valueDimension = (horz ? me.width : me.height) / offsetAmt;
-
-			pixel -= horz ? me.left : me.top;
-
-			if (offset) {
-				pixel -= (valueDimension / 2);
-			}
-
-			if (pixel <= 0) {
-				value = 0;
+				return this.left + Math.round(widthOffset);
 			} else {
-				value = Math.round(pixel / valueDimension);
-			}
+				var innerHeight = this.height - (this.paddingTop + this.paddingBottom);
+				var valueHeight = innerHeight / offsetAmt;
+				var heightOffset = (valueHeight * (index - this.startIndex)) + this.paddingTop;
 
-			return value + me.minIndex;
+				if (this.options.gridLines.offsetGridLines && includeOffset) {
+					heightOffset += (valueHeight / 2);
+				}
+
+				return this.top + Math.round(heightOffset);
+			}
 		},
-		getBasePixel: function() {
-			return this.bottom;
+		getPixelForTick: function(index, includeOffset) {
+			return this.getPixelForValue(this.ticks[index], index + this.startIndex, null, includeOffset);
 		}
 	});
 
-	scaleService.registerScaleType('category', DatasetScale, defaultConfig);
+	Chart.scaleService.registerScaleType("category", DatasetScale, defaultConfig);
+
 };

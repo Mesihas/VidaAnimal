@@ -5,6 +5,9 @@ using System.Data.SqlClient;
 using System.Linq;
 using VidaAnimal.Models.DTO;
 
+
+
+
 namespace VidaAnimal.Services
 {
   public interface ISalesDataService
@@ -25,36 +28,44 @@ namespace VidaAnimal.Services
 
     public Vamo GetSales(int skip, int take, int page, int pageSize, DateTime startDate, DateTime endDate)
     {
-      IEnumerable<SalesDetailDTO> sales = null;
-      int total;
-      List<GridSort> sort = null;
-      using (var connection = new SqlConnection(connectionString))
+      try
       {
-        string sqlFormattedStartDate = startDate.ToString("yyyy-MM-dd HH:mm:ss");
-        string sqlFormattedEndDate = endDate.ToString("yyyy-MM-dd HH:mm:ss");
+        IEnumerable<SalesDetailDTO> sales = null;
+        int total;
+        List<GridSort> sort = null;
+        using (var connection = new SqlConnection(connectionString))
+        {
+          string sqlFormattedStartDate = startDate.ToString("yyyy-MM-dd HH:mm:ss");
+          string sqlFormattedEndDate = endDate.ToString("yyyy-MM-dd HH:mm:ss");
 
-        string mainSqlQuery = string.Format(@"SELECT SalesId as Id, SellingDate as SaleDate, FirstName as ClientName, '$'+ FORMAT(Total,'#,0.00') as Total " +
-                       "FROM TblSales S INNER JOIN TblClient C ON C.ClientId = S.ClientId " +
-                       "WHERE SellingDate between '{0}' and '{1}'", sqlFormattedStartDate, sqlFormattedEndDate);
-                    
-        total = connection.Query<SalesDetailDTO>(mainSqlQuery).Count();
-       
-        var orderByClause = KendoUIQueryHelper.BuildOrderByClause(sort);
+          string mainSqlQuery = string.Format(@"SELECT SalesId as Id, SellingDate as SaleDate, FirstName as ClientName, '$'+ FORMAT(Total,'#,0.00') as Total " +
+                         "FROM TblSales S INNER JOIN TblClient C ON C.ClientId = S.ClientId " +
+                         "WHERE SellingDate between '{0}' and '{1}'", sqlFormattedStartDate, sqlFormattedEndDate);
 
-        orderByClause = string.IsNullOrEmpty(orderByClause) ? "ORDER BY Id, SaleDate" : orderByClause;
+          total = connection.Query<SalesDetailDTO>(mainSqlQuery).Count();
 
-        var sqlQuery = string.Format(@"	
+          var orderByClause = KendoUIQueryHelper.BuildOrderByClause(sort);
+
+          orderByClause = string.IsNullOrEmpty(orderByClause) ? "ORDER BY Id, SaleDate" : orderByClause;
+
+          var sqlQuery = string.Format(@"	
               SELECT * FROM (SELECT *, ROW_NUMBER() OVER({3}) AS Row FROM ({2}) D) Filter
               WHERE Row BETWEEN  (({0} - 1) * {1}  + 1) AND  ({0} * {1})", page, pageSize, mainSqlQuery, orderByClause);
 
-        sales = connection.Query<SalesDetailDTO>(sqlQuery);
+          sales = connection.Query<SalesDetailDTO>(sqlQuery);
+        }
+        return (new Vamo
+        {
+          Data = sales,
+          Total = total
+        });
       }
-      return (new Vamo
+      catch (Exception ex)
       {
-        Data = sales,
-        Total = total
-      });
-    }
+        var msg = ex.ToString();
+        return null;
+      }
+}
 
     //public Vamo GetSales(int skip, int take, int page, int pageSize, string orderByClause, string whereClause)
     //{

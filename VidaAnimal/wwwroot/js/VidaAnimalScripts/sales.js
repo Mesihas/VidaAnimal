@@ -47,14 +47,15 @@ function loadDataSourceGridSales() {
 
   var startDat = $.datepicker.formatDate('mm-dd-yy', sd);
   var endDat = $.datepicker.formatDate('mm-dd-yy', ed);
-  alert("start: " + startDat + " " + "end: " + endDat)
+ // alert("start: " + startDat + " " + "end: " + endDat)
+
 
    dataSource = new kendo.data.DataSource({
     type: "json",
     transport: {
       read: {
         url: '/api/GetSales',
-        data: {startDate: startDat, endDate: endDat }
+      //  data: { startDate: "01/30/2017", endDate: "12/30/2018" }
       },
     },
     schema: {
@@ -67,8 +68,8 @@ function loadDataSourceGridSales() {
     },
     pageSize: 5,
     serverPaging: true,
-    //  serverFiltering: true,
-    //  serverSorting: true,
+    serverFiltering: true,
+    serverSorting: true,
   });
 }
 
