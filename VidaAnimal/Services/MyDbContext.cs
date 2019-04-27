@@ -18,7 +18,7 @@ namespace VidaAnimal.Services
         protected override void OnConfiguring(DbContextOptionsBuilder option)
         {
         //    option.UseSqlServer("Data Source = 10.0.1.225,1433; Initial Catalog = VidaAnimal;  User ID = sa; Password = macanudo22 ;");
-            option.UseSqlServer("Data Source = ALEJANDRO-PC; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"); 
+            option.UseSqlServer("Data Source = NETDEV; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"); 
         }
     }
 }

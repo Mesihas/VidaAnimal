@@ -25,12 +25,10 @@ $(function () {
   $("#start").datepicker().datepicker('setDate', '-1m');
   $('#end').datepicker().datepicker('setDate', new Date());
 
-  loadDataSourceGridSales();
-  grid(dataSource);
+  initgrid();
 
   $("#get").click(function () {
-    loadDataSourceGridSales();
-    $('#salesGrid').data('kendoGrid').dataSource.read();
+      $('#salesGrid').data('kendoGrid').dataSource.read();
   });
 
 });
@@ -40,21 +38,22 @@ function resizeGrid() {
   $("#salesGrid").data("kendoGrid").resize();
 }
 
-function loadDataSourceGridSales() {
 
-  var sd = $("#start").datepicker("getDate");
-  var ed = $("#end").datepicker("getDate");
 
-  var startDat = $.datepicker.formatDate('mm-dd-yy', sd);
-  var endDat = $.datepicker.formatDate('mm-dd-yy', ed);
-  alert("start: " + startDat + " " + "end: " + endDat)
+function initgrid() {
 
    dataSource = new kendo.data.DataSource({
     type: "json",
     transport: {
       read: {
         url: '/api/GetSales',
-        data: {startDate: startDat, endDate: endDat }
+        data: function () {
+          var sd = $("#start").datepicker("getDate");
+          var ed = $("#end").datepicker("getDate");
+          startPicker = $.datepicker.formatDate('mm-dd-yy', sd);
+          var endPicker = $.datepicker.formatDate('mm-dd-yy', ed);
+          return { startDate: startPicker, endDate: endPicker }
+        }
       },
     },
     schema: {
@@ -69,10 +68,7 @@ function loadDataSourceGridSales() {
     serverPaging: true,
     //  serverFiltering: true,
     //  serverSorting: true,
-  });
-}
-
-function grid(dataSource) {
+   });
 
   $("#salesGrid").kendoGrid({
     dataSource: dataSource,

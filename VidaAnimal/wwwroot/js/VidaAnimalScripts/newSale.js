@@ -177,6 +177,7 @@ $('#saveSale').on('click', function (event) {
     data: JSON.stringify(sale) ,
     success: function (response) {
       //response ? alert("It worked!") : alert("It didn't work.");
+      window.location.href = '/Sales/Index';
     }
   });
 

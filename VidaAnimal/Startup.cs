@@ -43,8 +43,8 @@ namespace VidaAnimal
             }).AddEntityFrameworkStores<MyDbContext>();
 
             services.AddDbContext<MyDbContext>();
-            services.AddTransient<ISupplierProvider>(f => new SupplierProvider(@"Data Source = ALEJANDRO-PC; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"));
-            services.AddTransient<ISalesDataService>(f => new SalesDataService(@"Data Source = ALEJANDRO-PC; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"));
+            services.AddTransient<ISupplierProvider>(f => new SupplierProvider(@"Data Source = NETDEV; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"));
+            services.AddTransient<ISalesDataService>(f => new SalesDataService(@"Data Source = NETDEV; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"));
 
       
       // add My services      
