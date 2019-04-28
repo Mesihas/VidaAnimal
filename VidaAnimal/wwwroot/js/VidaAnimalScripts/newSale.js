@@ -19,6 +19,16 @@ $(function () {
     }
   });
 
+  $.ajax({
+    type: "Get",
+    url: "/api/Client/getClientsDropDown",
+    dataType: "json",
+    success: function (data) {
+      Clients = data;
+      FillClients(Clients);
+    }
+  });
+
   $("#CategoriesDropdown").change(function () {
     categoryId = this.value;
     GetProducts(categoryId);
@@ -37,6 +47,12 @@ function GetProducts(categoryId) {
       $(productsDropdown).empty();
       FillProduts(products);
     }
+  });
+}
+
+function FillClients(clients) {
+  $.each(clients, function () {
+    $("#ClientsDropdown").append($("<option />").val(this.clientId).text(this.lastName));
   });
 }
 
@@ -163,7 +179,7 @@ function RefreshGrid() {
 
 $('#saveSale').on('click', function (event) {
 
-  clientId = $("#client").val();
+  clientId = $("#ClientsDropdown").val();
   sellingDate = $("#datepicker").val();
   payWayId = $("#payWay").val();
   info = $("#info").val();

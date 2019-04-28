@@ -11,6 +11,7 @@ namespace VidaAnimal
     public class Startup
     {
         public IConfiguration Configuration { get; set; }
+    private string conn = @"Data Source = NETDEV; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true";
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -43,8 +44,8 @@ namespace VidaAnimal
             }).AddEntityFrameworkStores<MyDbContext>();
 
             services.AddDbContext<MyDbContext>();
-            services.AddTransient<ISupplierProvider>(f => new SupplierProvider(@"Data Source = NETDEV; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"));
-            services.AddTransient<ISalesDataService>(f => new SalesDataService(@"Data Source = NETDEV; Initial Catalog = VidaAnimal; Integrated Security=True; MultipleActiveResultSets=true"));
+            services.AddTransient<ISupplierProvider>(f => new SupplierProvider(conn));
+            services.AddTransient<ISalesDataService>(f => new SalesDataService(conn));
 
       
       // add My services      
@@ -102,7 +103,7 @@ namespace VidaAnimal
                 routes.MapRoute(
                     name: "default",
                     //       template: "{controller=Home}/{action=Index}/{id?}");
-                    template: "{controller=Sales}/{action=Index}/{id?}");
+                    template: "{controller=Client}/{action=Index}/{id?}");
             });
         }
     }

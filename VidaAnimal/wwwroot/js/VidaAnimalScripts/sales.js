@@ -39,7 +39,6 @@ function resizeGrid() {
 }
 
 
-
 function initgrid() {
 
    dataSource = new kendo.data.DataSource({
@@ -144,7 +143,7 @@ function initgrid() {
 function GetSaleById(x) {
   $.ajax({
     type: "Get",
-    url: "api/GetsalesById",
+    url: "/api/GetsalesById",
     data: { id: x },
     dataType: "json",
     success: function (result) {
