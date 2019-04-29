@@ -19,7 +19,7 @@ namespace VidaAnimal.Controllers
     private IDataService<SalesDetail> _saleDetailService;
     private readonly ISalesDataService _salesrProvider;
     public SalesApiController(MyDbContext context,
-                              IDataService<Category> categoryService, 
+                              IDataService<Category> categoryService,
                               IDataService<Product> productService,
                               IDataService<Sales> saleService,
                               IDataService<SalesDetail> saleDetailService,
@@ -33,20 +33,21 @@ namespace VidaAnimal.Controllers
       _salesrProvider = salesrProvider;
     }
 
-    [HttpGet("api/GetSales")]
-  //  [Authorize]
-  //  public JsonResult GetSales(int skip, int take, int page, int pageSize, [FromQuery] List<GridSort> sort, [FromQuery] GridFilters filter)
-    public JsonResult GetSales(int skip, int take, int page, int pageSize, DateTime startDate, DateTime endDate)
+    [HttpPost("api/GetSales")]
+    //  [Authorize]
+    public JsonResult GetSales(int skip, int take, int page, int pageSize, DateTime startDate, DateTime endDate, List<GridSort> sort, GridFilters filter)
     {
       try
       {
-        Vamo result =  _salesrProvider.GetSales(skip, take, page, pageSize, startDate, endDate);
+        Vamo result = _salesrProvider.GetSales(skip, take, page, pageSize, startDate, endDate, sort, filter);
 
         return Json(new
         {
           Data = result.Data,
           Total = result.Total
         });
+
+        //      return Json("ok");
       }
       catch (Exception ex)
       {
@@ -56,7 +57,7 @@ namespace VidaAnimal.Controllers
     }
 
     [HttpGet("api/GetsalesById")]
- //   [Authorize]
+    //   [Authorize]
     public JsonResult GetSalesDetails(int id)
     {
       try
@@ -70,7 +71,7 @@ namespace VidaAnimal.Controllers
         return Json(new { message = ex.Message });
       }
     }
-  
+
     [HttpGet("api/getCategories")]
     [Authorize]
     public JsonResult GetCategories()
@@ -94,7 +95,7 @@ namespace VidaAnimal.Controllers
       try
       {
         IEnumerable<Product> products = _productDataService.Query(p => p.CategoryId == id);
-        return Json( products );
+        return Json(products);
       }
       catch (Exception ex)
       {
@@ -114,12 +115,12 @@ namespace VidaAnimal.Controllers
           CultureInfo MyCultureInfo = new CultureInfo("de-DE");
           string MyString = sale.SellingDate;
           DateTime MyDateTime = DateTime.Parse(MyString, MyCultureInfo);
-     
+
           Sales sal = new Sales
           {
             ClientId = sale.ClientId,
             SellingDate = MyDateTime,
-            PayWayId = 1,
+            PayWayId = sale.PayWayId,
             Obs = sale.Info
           };
 

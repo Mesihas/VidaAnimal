@@ -28,7 +28,13 @@ $(function () {
       FillClients(Clients);
     }
   });
+  formaDePago = [
+    { PayWayId: 1, formaDePago: "Contado" },
+    { PayWayId: 2, formaDePago: "Debito" },
+    { PayWayId: 3, formaDePago: "Targeta" },
+  ];
 
+  FillFormasDePago(formaDePago)
   $("#CategoriesDropdown").change(function () {
     categoryId = this.value;
     GetProducts(categoryId);
@@ -66,7 +72,12 @@ function FillProduts(products) {
   $.each(products, function () {
     $("#productsDropdown").append($("<option />").val(this.productId).text(this.productName));
   });
+}
 
+function FillFormasDePago(formaDePago) {
+  $.each(formaDePago, function () {
+    $("#formaDePagoDropDown").append($("<option />").val(this.PayWayId).text(this.formaDePago));
+  });
 }
 
 $('#addItem').on('click', function (event) {
@@ -178,12 +189,22 @@ function RefreshGrid() {
 }
 
 $('#saveSale').on('click', function (event) {
+  sellingDate = $("#datepicker").datepicker('getDate');
+  var now = new Date();
+  var day = sellingDate.getDate();
+  var month = sellingDate.getMonth();
+  var year = sellingDate.getFullYear();
+  var hours = now.getHours();
+  var minutes = now.getMinutes();
+  var seconds = now.getSeconds();
+
+  sd = new Date(year, month, day, hours, minutes, seconds);
 
   clientId = $("#ClientsDropdown").val();
-  sellingDate = $("#datepicker").val();
-  payWayId = $("#payWay").val();
+
+  payWayId = $("#formaDePagoDropDown").val();
   info = $("#info").val();
-  var sale = new saleMain(clientId, info, saleItems, payWayId, sellingDate);
+  var sale = new saleMain(clientId, info, saleItems, payWayId, sd);
 
   $.ajax({
     type: "POST",

@@ -29,7 +29,16 @@ function initgrid() {
     type: "json",
     transport: {
       read: {
-        url: '/api/Client'
+        url: '/api/Client',
+        type: "POST",
+        complete: function (response) {
+          if (response.status >= 400) {
+            var msg = (eval("(" + response.responseText + ")")).Message;
+            console.log(msg);
+          }
+          console.log("data");
+
+        }
       },
       update: {
         url: "/api/client/addClient",
@@ -38,15 +47,27 @@ function initgrid() {
         //data: function (e) {
         //  return { e };
         //}
+
+
       },
       //destroy: {
       //  url:  "/Products/Destroy",
       //  dataType: "jsonp"
       //},
       create: {
-        url:  "/api/client/addClient",
+        url: "/api/client/addClient",
         dataType: "jsonp",
-        type: "PUT"
+        type: "PUT",
+        complete: function (response) {
+          if (response.status >= 400) {
+            var msg = (eval("(" + response.responseText + ")")).Message;
+            console.log(msg);
+          }
+          console.log("saveDS");
+          $("#ClientsGrid").data("kendoGrid").dataSource.read();
+          grid = $("#ClientsGrid").data("kendoGrid");
+     //     grid.refresh();
+        }
       },
       //parameterMap: function (options, operation) {
       //  if (operation !== "read" && options.models) {
@@ -65,28 +86,29 @@ function initgrid() {
       model: {
         id: "clientId",
         fields: {
-          clientId: { editable: false},
-          firstName: { validation: { required: true } },
+          clientId: { editable: false },
+          FirstName: { validation: { required: true } },
           lastName: { validation: { required: true } },
           telephone: { type: "number" },
           address: { editable: true },
-          cuit: { editable: true }        
+          cuit: { editable: true }
         }
       }
     },
     pageSize: 5,
     serverPaging: true,
-    //  serverFiltering: true,
-    //  serverSorting: true,
+    serverFiltering: true,
+    serverSorting: true,
   });
 
   $("#ClientsGrid").kendoGrid({
     dataSource: dataSource,
-    groupable: false,
-    sortable: {
-      mode: "multiple",
-      allowUnsort: true
-    },
+ //   groupable: false,
+    //sortable: {
+    //  mode: "multiple",
+    //  allowUnsort: true
+    //},
+    sortable: true,
     pageable: {
       numeric: true,
       refresh: true,
@@ -148,11 +170,25 @@ function initgrid() {
         field: "cuit",
         title: "CUIT"
       },
-  //  { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+      //  { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
       { command: ["edit"], title: "&nbsp;", width: "250px" }
     ],
     toolbar: ["create"],
-    editable: "inline"
+    editable: "inline",
+    save: function () {
+     /// console.log("save");
+    }
   });
+
+  $(".k-grid").on("mousedown", ".k-button:not('.k-grid-cancel,.k-grid-update')", function (e) {
+    var grid = $(this).closest(".k-grid");
+    var editRow = grid.find(".k-grid-edit-row");
+
+    if (editRow.length > 0) {
+      alert("Please complete the editing operation before editing another row");
+      e.preventDefault();
+    }
+  });
+
 }
 

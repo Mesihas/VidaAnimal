@@ -18,8 +18,8 @@ namespace VidaAnimal.Models.DTO
     {
     public int Id { get; set; }
     public DateTime SaleDate { get; set; }
-    public string ClientName { get; set; }
-    public string Total { get; set; }
+    public string clientName { get; set; }
+    public string total { get; set; }
   }
 
   public class SalesOrder

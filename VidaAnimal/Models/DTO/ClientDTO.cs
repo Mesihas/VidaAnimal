@@ -8,10 +8,10 @@ namespace VidaAnimal.Models.DTO
   public class ClientDTO
   {
     public int ClientId { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Telephone { get; set; }
-    public string Address { get; set; }
-    public string CUIT { get; set; }
+    public string firstName { get; set; }
+    public string lastName { get; set; }
+    public string telephone { get; set; }
+    public string address { get; set; }
+    public string cuit { get; set; }
   }
 }

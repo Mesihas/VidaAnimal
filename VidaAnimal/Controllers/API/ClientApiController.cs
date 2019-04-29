@@ -24,21 +24,23 @@ namespace VidaAnimal.Controllers
       _ClientDataService = clientService;
     }
   
-    [HttpGet("api/Client")]
+    [HttpPost("api/Client")]
     //  [Authorize]
-    public JsonResult GetClients(int skip, int take, int page, int pageSize)
+    public JsonResult GetClients(int skip, int take, int page, DateTime startDate, DateTime endDate, int pageSize, List<GridSort> sort, GridFilters filter)
     {
       try
       {
         IEnumerable<Client> clients = null;
         int total;
-        List<GridSort> sort = null;
+      //  List<GridSort> sort = null;
         using (var connection = new SqlConnection(connectionString))
         {
-          string mainSqlQuery = string.Format(@"SELECT ClientId, FirstName, LastName, Telephone, Address, CUIT FROM TblCLient");
+          var whereCLause = KendoUIQueryHelper.BuildWhereClause<ClientDTO>(filter);
+          string mainSqlQuery = string.Format(@"SELECT ClientId, FirstName as firstName, LastName, Telephone, Address, CUIT FROM TblCLient {0}", whereCLause);
 
           total = connection.Query<Client>(mainSqlQuery).Count();
           var orderByClause = KendoUIQueryHelper.BuildOrderByClause(sort);
+         
           orderByClause = string.IsNullOrEmpty(orderByClause) ? "ORDER BY ClientId, LastName" : orderByClause;
 
           var sqlQuery = string.Format(@"	

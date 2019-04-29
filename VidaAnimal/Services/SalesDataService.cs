@@ -10,8 +10,8 @@ namespace VidaAnimal.Services
 {
   public interface ISalesDataService
   {
-    Vamo GetSales(int skip, int take, int page, int pageSize, DateTime startDate, DateTime endDate);
-    //    Vamo GetSales(int skip, int take, int page, int pageSize, string whereClause, string orderByClause, List<GridSort> sort, GridFilters filter);
+   // Vamo GetSales(int skip, int take, int page, int pageSize);
+    Vamo GetSales(int skip, int take, int page, int pageSize, DateTime startDate, DateTime endDate, List<GridSort> sort, GridFilters filter);
     IEnumerable<SalesDetailDTO> GetSaleByID(int id);
     IEnumerable<SalesDetailDTOAux> GetSaleDetail(int id);
   }
@@ -24,21 +24,32 @@ namespace VidaAnimal.Services
       this.connectionString = connectionString;
     }
 
-    public Vamo GetSales(int skip, int take, int page, int pageSize, DateTime startDate, DateTime endDate)
+    public Vamo GetSales(int skip, int take, int page, int pageSize, DateTime startDate, DateTime endDate, List<GridSort> sort, GridFilters filter)
     {
       try
       {
         IEnumerable<SalesDetailDTO> sales = null;
         int total;
-        List<GridSort> sort = null;
+
         using (var connection = new SqlConnection(connectionString))
         {
-            string sqlFormattedStartDate = startDate.ToString("yyyy-MM-dd HH:mm:ss");
-            string sqlFormattedEndDate = endDate.ToString("yyyy-MM-dd HH:mm:ss");
+          string sqlFormattedStartDate = startDate.ToString("yyyy-MM-dd HH:mm:ss");
+          string sqlFormattedEndDate = endDate.ToString("yyyy-MM-dd HH:mm:ss");
+          var whereCLause = KendoUIQueryHelper.BuildWhereClause<SalesDetailDTO>(filter);
 
-            string mainSqlQuery = string.Format(@"SELECT SalesId as Id, SellingDate as SaleDate, FirstName as ClientName, '$'+ FORMAT(Total,'#,0.00') as Total " +
+          string finalWhereClause = "";
+          if (filter.Filters == null)
+          {
+            finalWhereClause = "WHERE SellingDate between '{0}' and '{1}'";
+          }
+          else
+          {
+            finalWhereClause = whereCLause + " AND SellingDate between '{0}' and '{1}'";
+          }
+
+          string mainSqlQuery = string.Format(@"SELECT SalesId as Id, SellingDate as SaleDate, FirstName as clientName, '$'+ FORMAT(Total,'#,0.00') as Total " +
                         "FROM TblSales S INNER JOIN TblClient C ON C.ClientId = S.ClientId " +
-                        "WHERE SellingDate between '{0}' and '{1}'", sqlFormattedStartDate, sqlFormattedEndDate);
+                        finalWhereClause , sqlFormattedStartDate, sqlFormattedEndDate);
 
             total = connection.Query<SalesDetailDTO>(mainSqlQuery).Count();
 
